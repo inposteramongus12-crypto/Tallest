@@ -8,7 +8,7 @@ let part = 0, n = 0;
 for (let i = 0; i < src.length; i++) {
 	const pm = src[i].match(/^## (\d+)\./);
 	if (pm) part = +pm[1];
-	const m = src[i].match(/^\*\*(N|HERO|LEHA|COACH|MAMA):\*\* (.+)$/);
+	const m = src[i].match(/^\*\*([A-Z]+):\*\* (.+)$/);
 	if (!m) continue;
 	const act = [];
 	for (let j = i + 1; j < src.length && src[j].startsWith('['); j++) act.push(src[j].replace(/^\[|\]$/g, ''));

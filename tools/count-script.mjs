@@ -1,9 +1,9 @@
-// Counts voiced words/characters in script.md: only lines "**N|HERO|LEHA|COACH|MAMA:** text".
+// Counts voiced words/characters in script.md: only lines "**SPEAKER:** text" (SPEAKER = latin capitals: N, HERO, SIS…).
 // Bubbles (*Облачко*) and [notes] are not counted. Flags lines over the limits (N 25, others 10).
 //   node tools/count-script.mjs [script.md]
 import fs from 'node:fs';
 const t = fs.readFileSync(process.argv[2] ?? 'script.md', 'utf8');
-const re = /^\*\*(N|HERO|LEHA|COACH|MAMA):\*\* (.+)$/gm;
+const re = /^\*\*([A-Z]+):\*\* (.+)$/gm;
 let words = 0, chars = 0, n = 0;
 const per = {};
 for (const m of t.matchAll(re)) {

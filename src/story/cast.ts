@@ -1,31 +1,28 @@
 import type {Base} from '../kit/actions';
 
-/* Characters of «Что если ты станешь Майком Тайсоном?». Key = id used in <Actor who="..."/>; `sp` = speaker code
-   in lines.json (default: the id in upper case). Every body colour has its own hue, so nobody merges with another
-   character or with the dark-blue / warm-light backgrounds (checked on the Cast sheet, both backgrounds).
-   Hero: pass fist="white" (clenched) or fist="skin" (relaxed) in the shots that show knuckles.
-   Voiceless extras (Gera, rival, referee, Douglas, entourage) have no `sp`: they talk only through bubbles. */
+/* Characters of «Что если ты станешь самым высоким?». Key = id used in <Actor who="..."/>; `sp` = speaker code in lines.json.
+   Every main character has its own hue, outfit and proportions (checked on the Cast sheet on both backgrounds).
+   Voiceless extras have no `sp`: they talk only through bubbles. */
 export type CastMember = Base & {sp?: string};
 
 export const CAST: Record<string, CastMember> = {
-	// Даня, герой: жёлтая толстовка
-	hero: {sp: 'HERO', color: '#f2b21c', outfit: 'hoodie', hair: 'short', rim: '#fff0cc', rimW: 2.4, shoe: '#f2f2f2'},
-	// Лёха: синяя толстовка, рыжие вихры, очки (блокнот «ТЕОРИИ»)
-	leha: {sp: 'LEHA', color: '#2f6fd8', outfit: 'hoodie', hair: 'spiky', hairColor: '#c9672a', acc: ['glasses'], rim: '#e6f0ff', rimW: 2.4, shoe: '#f2f2f2'},
-	// Семён Ильич: старик, клетчатая кепка тёмно-красная, седые усы, серо-стальная куртка
-	coach: {sp: 'COACH', color: '#6b7f8e', outfit: 'coat', hair: 'cap', hairColor: '#8c2a2a', acc: ['mustache'], rim: '#eef4ff', rimW: 2.4, shoe: '#2b2f3a'},
-	// мама: фиолетовый халат, каре
-	mama: {sp: 'MAMA', color: '#8e5cd9', outfit: 'gown', hair: 'bob', rim: '#f0e4ff', rimW: 2.4, shoe: '#2c2540'},
-	// Гера из третьего подъезда: коричневая футболка, бритая голова
-	gera: {color: '#a9743f', outfit: 'tee', hair: 'none', rim: '#ffe6c8', rimW: 2.4, shoe: '#1d1d22'},
-	// соперник в первых боях: оранжевая майка, хвост
-	rival: {color: '#ee6a2c', outfit: 'tee', hair: 'ponytail', hairColor: '#2b2f3a', rim: '#ffe0cc', rimW: 2.4, shoe: '#f2f2f2'},
-	// рефери: светлая рубашка, красный галстук (outfit suit), тёмная окантовка, чтобы читался и на светлом фоне
-	referee: {color: '#e6e9ef', outfit: 'suit', hair: 'short', rim: '#2b2f3a', rimW: 2.6, shoe: '#111'},
-	// Дуглас, соперник в Токио: бирюзовый, длинный и спокойный (в кадре рисуй чуть выше героя: s +0.1)
-	douglas: {color: '#17b3c4', outfit: 'tee', hair: 'none', rim: '#dffaff', rimW: 2.4, shoe: '#f2f2f2'},
-	// свита: три костюма разного цвета, у каждого свой знак
-	svita1: {color: '#e0449b', outfit: 'suit', hair: 'bun', hairColor: '#4a3426', acc: ['glasses'], rim: '#ffe0f0', rimW: 2.4, shoe: '#2b1d24'},
-	svita2: {color: '#8c1d40', outfit: 'suit', hair: 'cap', hairColor: '#e8e8ee', acc: ['mustache'], rim: '#ffd0dc', rimW: 2.4, shoe: '#111'},
-	svita3: {color: '#2aa876', outfit: 'suit', hair: 'short', hairColor: '#5a3a22', rim: '#e0fff0', rimW: 2.4, shoe: '#111'},
+	// Ярик, герой: коралловое поло с белым воротником, кудри, тёмно-синие джинсы, худой и длинноногий
+	hero: {sp: 'HERO', color: '#e8524a', outfit: 'polo', trim: '#fff1e6', hair: 'curly', legColor: '#1f2a44', shoe: '#f4f4f4', rim: '#ffe1d6', rimW: 2.4, build: {w: 0.9, leg: 1.06}},
+	// Ася, 9: зелёное платье, хвостики с жёлтыми резинками, большая голова, короткие ноги
+	sis: {sp: 'SIS', color: '#4fb35f', outfit: 'dress', trim: '#ffd23f', hair: 'pigtails', hairColor: '#ffd23f', legColor: '#2b2b33', shoe: '#ff7aa8', rim: '#eaffe6', rimW: 2.4, build: {w: 0.8, head: 1.16, leg: 0.8}},
+	// Мирон: бирюзовая рубашка + оранжевый жилет с карманами, панамка, очки на лбу, рулетка на поясе
+	friend: {sp: 'FRIEND', color: '#23a39a', outfit: 'vest', trim: '#f0a33a', hair: 'beanie', hairColor: '#f0a33a', acc: ['foreheadGlasses', 'tape'], legColor: '#4a4036', shoe: '#2f2f35', rim: '#e0fffb', rimW: 2.4, build: {w: 0.86, head: 1.06, leg: 0.95}},
+	// папа: охристая рубашка, широкий, залысины с сединой, борода щетиной
+	dad: {sp: 'DAD', color: '#c98a3a', outfit: 'shirt', trim: '#fff6e6', hair: 'receding', hairColor: '#8b8f9c', acc: ['beard'], legColor: '#383a46', shoe: '#5a3a26', rim: '#fff0d8', rimW: 2.4, build: {w: 1.22, leg: 0.94}},
+	// без голоса
+	blogger: {color: '#d6336c', outfit: 'tee', hair: 'beanie', hairColor: '#22283a', legColor: '#1d1d22', shoe: '#ffffff', rim: '#ffe0ea', rimW: 2.4, build: {w: 0.95}},
+	operator: {color: '#ff8c1a', outfit: 'hivis', trim: '#e9f2f2', hair: 'helmet', hairColor: '#f2f2f2', legColor: '#2c3340', shoe: '#1d1d22', rim: '#fff0dc', rimW: 2.4, build: {w: 1.1}},
+	rescuer: {color: '#c9302c', outfit: 'coat', hair: 'helmet', hairColor: '#ffcc00', legColor: '#2c3340', shoe: '#111', rim: '#ffe0dc', rimW: 2.4, build: {w: 1.12}},
+	neighbor: {color: '#b58ad8', outfit: 'shirt', trim: '#fff', hair: 'bun', legColor: '#3a3346', shoe: '#5a3a46', rim: '#f4e8ff', rimW: 2.4},
+	neighborM: {color: '#9aa3ad', outfit: 'tee', hair: 'receding', hairColor: '#2b2b30', legColor: '#2b2f3a', shoe: '#2b2f3a', rim: '#eef2f6', rimW: 2.4, build: {w: 1.15}},
+	kid: {color: '#f2c94c', outfit: 'tee', hair: 'short', legColor: '#3a5a8a', shoe: '#e94f4f', rim: '#fff8dc', rimW: 2.4, build: {w: 0.78, head: 1.14, leg: 0.78}},
+	rival1: {color: '#3a3f9a', outfit: 'tee', hair: 'spiky', legColor: '#111', shoe: '#fff', rim: '#e6e8ff', rimW: 2.4, build: {w: 1.05, leg: 1.04}},
+	rival2: {color: '#7b3fa0', outfit: 'tee', hair: 'none', legColor: '#111', shoe: '#fff', rim: '#f4e6ff', rimW: 2.4, build: {w: 1.1}},
+	cashier: {color: '#4b8f80', outfit: 'apron', hair: 'bob', legColor: '#2b2f3a', shoe: '#2b2f3a', rim: '#e6fff8', rimW: 2.4},
+	granny: {color: '#a05a7a', outfit: 'gown', hair: 'grey', hairColor: '#e8e8ee', legColor: '#3a2a33', shoe: '#3a2a33', rim: '#ffe8f2', rimW: 2.4, build: {w: 1.05, leg: 0.9}},
 };

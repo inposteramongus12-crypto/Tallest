@@ -2,9 +2,11 @@ import React from 'react';
 import {darken, lighten} from './color';
 
 export type Expr = 'normal' | 'angry' | 'sad' | 'sleepy' | 'wide' | 'worried';
-export type Hair = 'none' | 'spiky' | 'bun' | 'cap' | 'ponytail' | 'grey' | 'bob' | 'short';
-export type Outfit = 'hoodie' | 'suit' | 'gown' | 'coat' | 'apron' | 'tee';
-export type Acc = 'headphones' | 'mustache' | 'glasses';
+export type Hair = 'none' | 'spiky' | 'bun' | 'cap' | 'ponytail' | 'grey' | 'bob' | 'short' | 'curly' | 'pigtails' | 'receding' | 'beanie' | 'helmet';
+export type Outfit = 'hoodie' | 'suit' | 'gown' | 'coat' | 'apron' | 'tee' | 'polo' | 'dress' | 'vest' | 'shirt' | 'hivis';
+export type Acc = 'headphones' | 'mustache' | 'glasses' | 'foreheadGlasses' | 'beard' | 'tape' | 'apronOver';
+/* body proportions: w = width of torso and limbs, head = head size, leg = leg length (Actor keeps the feet on the floor) */
+export type Build = {w?: number; head?: number; leg?: number};
 export type Mouth = 'line' | 'frown' | 'open' | 'smile' | 'flat' | 'smirk' | 'none';
 export type HandShape = 'fist' | 'point' | 'snap';
 // knuckle state of the big fist glyph: white = clenched, skin = relaxed natural colour
@@ -77,8 +79,23 @@ type Props = {
 	// replaces the small dark hands with a large fist whose knuckle colour reads at medium shot
 	fist?: Knuckles;
 	// fist glyph size multiplier (default 1.3); raise it on medium shots so the knuckle colour reads
-	fistK?: number;
+fistK?: number;
+	build?: Build;
+	// colour of the flat cuff band at the wrist (default: sleeve colour, darker)
+	cuff?: string;
+	// trim colour of new outfits (polo collar, dress belt, vest panels, hi-vis stripes)
+	trim?: string;
 };
+
+/* Visible hand: flat cuff band across the wrist + mitten palm with a thumb. Local +y runs along the forearm. */
+export const Hand: React.FC<{at: V; ang: number; cuff: string; thumb?: 1 | -1; open?: boolean}> = ({at, ang, cuff, thumb = 1, open}) => (
+	<g transform={`translate(${at[0]},${at[1]}) rotate(${-ang})`}>
+		<rect x={-14} y={-9} width={28} height={8} rx={2.5} fill={cuff} />
+		<path d={open ? 'M-8,-2 L-9,14 Q-8,22 0,23 Q8,22 9,14 L8,-2 Z' : 'M-8,-2 L-8.5,9 Q-8,17 0,18 Q8,17 8.5,9 L8,-2 Z'} fill="#0b0b0d" />
+		<path d={`M${thumb * 6},1 q${thumb * 9},2 ${thumb * 9},10 q0,4 ${-thumb * 4},3`} stroke="#0b0b0d" strokeWidth={6.5} fill="none" strokeLinecap="round" />
+		{open ? <path d="M-4,20 L-4,26 M1,21 L1,28 M6,19 L6,25" stroke="#0b0b0d" strokeWidth={4.5} strokeLinecap="round" /> : null}
+	</g>
+);
 
 const Limb: React.FC<{pts: V[]; w: number; c: string; hi?: string; hiSide?: number}> = ({pts, w, c, hi, hiSide = -1}) => {
 	const d = 'M' + pts.map((p) => p.join(',')).join(' L');
@@ -131,6 +148,57 @@ const Eye: React.FC<{cx: number; cy: number; rx: number; ry: number; pr: number;
 );
 
 const HeadShape: React.FC<{hair: Hair; hairColor: string; front: boolean}> = ({hair, hairColor, front}) => {
+	if (hair === 'curly')
+		return front ? (
+			<g fill="#000">
+				{[[-40, -22, 17], [-30, -42, 18], [-10, -54, 19], [12, -54, 18], [32, -44, 17], [44, -24, 14], [-48, -2, 12]].map(([x, y, r], i) => (
+					<circle key={i} cx={x} cy={y} r={r} />
+				))}
+			</g>
+		) : (
+			<g fill="#000">
+				{[[-52, 6, 14], [-50, -30, 16], [-20, -58, 16], [28, -58, 14]].map(([x, y, r], i) => (
+					<circle key={i} cx={x} cy={y} r={r} />
+				))}
+			</g>
+		);
+	if (hair === 'pigtails')
+		return front ? (
+			<>
+				<path d={`M${-R},${-4} C${-R - 4},${-R - 8} ${R + 4},${-R - 12} ${R},${-8} C${R - 26},${-R + 16} ${-R + 20},${-R + 12} ${-R + 6},${2} Z`} fill="#000" />
+				<circle cx={-R - 4} cy={-14} r={6} fill={hairColor} />
+				<circle cx={R + 4} cy={-14} r={6} fill={hairColor} />
+			</>
+		) : (
+			<>
+				<path d={`M${-R - 6},${-14} C${-R - 36},${-8} ${-R - 34},${30} ${-R - 16},${46} C${-R - 20},${20} ${-R - 12},${0} ${-R - 2},${-6} Z`} fill="#000" />
+				<path d={`M${R + 6},${-14} C${R + 36},${-8} ${R + 34},${30} ${R + 16},${46} C${R + 20},${20} ${R + 12},${0} ${R + 2},${-6} Z`} fill="#000" />
+			</>
+		);
+	if (hair === 'receding')
+		return front ? (
+			<>
+				<path d={`M${-R - 3},${-2} C${-R - 6},${-26} ${-R + 4},${-34} ${-R + 14},${-30} L${-R + 6},${4} Z`} fill={hairColor} />
+				<path d={`M${R + 3},${-2} C${R + 6},${-26} ${R - 4},${-34} ${R - 14},${-30} L${R - 6},${4} Z`} fill={hairColor} />
+				<ellipse cx={-12} cy={-R + 12} rx={14} ry={5} fill="#3a3d48" opacity={0.9} />
+			</>
+		) : null;
+	if (hair === 'beanie')
+		return front ? (
+			<>
+				<path d={`M${-R - 2},${-10} C${-R - 2},${-R - 22} ${R + 2},${-R - 22} ${R + 2},${-10} Z`} fill={hairColor} />
+				<rect x={-R - 4} y={-18} width={2 * R + 8} height={14} rx={6} fill={darken(hairColor, 0.18)} />
+				<circle cx={0} cy={-R - 14} r={11} fill={lighten(hairColor, 0.25)} />
+			</>
+		) : null;
+	if (hair === 'helmet')
+		return front ? (
+			<>
+				<path d={`M${-R - 4},${-8} C${-R - 4},${-R - 24} ${R + 4},${-R - 24} ${R + 4},${-8} Z`} fill={hairColor} />
+				<rect x={-R - 10} y={-14} width={2 * R + 20} height={9} rx={4} fill={darken(hairColor, 0.2)} />
+				<rect x={-6} y={-R - 18} width={12} height={R + 2} rx={4} fill={lighten(hairColor, 0.3)} />
+			</>
+		) : null;
 	if (!front) {
 		if (hair === 'bun') return <circle cx={-6} cy={-R - 6} r={17} fill="#000" />;
 		if (hair === 'ponytail')
@@ -202,7 +270,8 @@ export const Stickman: React.FC<Props> = (p) => {
 		color,
 		outfit = 'hoodie',
 		hair = 'none',
-		hairColor = '#d9d9d9',
+hairColor = '#d9d9d9',
+		build = {},
 		expr = 'normal',
 		look = [0.2, 0],
 		blink = 0,
@@ -215,7 +284,12 @@ export const Stickman: React.FC<Props> = (p) => {
 		scale = 1,
 		facing = 1,
 	} = p;
-	const shoe = p.shoe ?? color;
+const shoe = p.shoe ?? color;
+	const BW = build.w ?? 1;
+	const HK = build.head ?? 1;
+	const LK = build.leg ?? 1;
+	const cuff = p.cuff ?? darken(color, 0.32);
+	const trim = p.trim ?? '#f4f1ea';
 	const hi = lighten(color, 0.35);
 	const sh = darken(color, 0.22);
 	const back = darken(color, 0.28);
@@ -225,7 +299,7 @@ export const Stickman: React.FC<Props> = (p) => {
 	const hip: V = [0, 0];
 	const shoulder = add(add(hip, up, T - 18), fwd, 2);
 	const shB = add(shoulder, fwd, -8);
-	const headC = add(hip, up, T + R * 0.78);
+const headC = add(hip, up, T + R * 0.78 * HK);
 
 	const arm = (s: V, a: [number, number]) => {
 		const e = add(s, dir(a[0]), UA);
@@ -233,8 +307,8 @@ export const Stickman: React.FC<Props> = (p) => {
 		return [s, e, h] as V[];
 	};
 	const leg = (s: V, a: [number, number]) => {
-		const k = add(s, dir(a[0]), TH);
-		const f = add(k, dir(a[0] - a[1]), SH);
+const k = add(s, dir(a[0]), TH * LK);
+		const f = add(k, dir(a[0] - a[1]), SH * LK);
 		return [s, k, f] as V[];
 	};
 	const aB = arm(shB, pose.armB);
@@ -287,7 +361,7 @@ export const Stickman: React.FC<Props> = (p) => {
 	const fid = 'rim-' + p.id;
 	const torsoTop = -T - 6;
 	const age = p.age ?? 0;
-	const bw = 30 * (1 + 0.18 * age);
+const bw = 30 * (1 + 0.18 * age) * BW;
 	const acc = p.acc ?? [];
 	return (
 		<g transform={`translate(${p.x},${p.y}) scale(${scale * facing * (1 + (p.squash ?? 0))},${scale * (1 - (p.squash ?? 0))})`}>
@@ -307,16 +381,16 @@ export const Stickman: React.FC<Props> = (p) => {
 				{/* back limbs */}
 				{p.hideLegs ? null : (
 					<>
-						<Limb pts={lB} w={13} c={darken(legColor, 0.2)} />
+<Limb pts={lB} w={13 * BW} c={darken(legColor, 0.2)} />
 						<ellipse cx={lB[2][0] + 9} cy={lB[2][1] + 2} rx={17} ry={9} fill={darken(shoe, 0.25)} />
 					</>
 				)}
-				<Limb pts={aB} w={23} c={back} />
-				{p.fist ? <Fist at={aB[2]} ang={pose.armB[0] + pose.armB[1]} k={p.fist} size={p.fistK} /> : <circle cx={aB[2][0]} cy={aB[2][1]} r={9.5} fill="#0b0b0d" />}
+<Limb pts={aB} w={23 * BW} c={back} />
+				{p.fist ? <Fist at={aB[2]} ang={pose.armB[0] + pose.armB[1]} k={p.fist} size={p.fistK} /> : <Hand at={aB[2]} ang={pose.armB[0] + pose.armB[1]} cuff={darken(cuff, 0.15)} thumb={-1} />}
 				{/* front leg */}
 				{p.hideLegs ? null : (
 					<>
-						<Limb pts={lF} w={13} c={legColor} />
+<Limb pts={lF} w={13 * BW} c={legColor} />
 						<ellipse cx={lF[2][0] + 9} cy={lF[2][1] + 2} rx={17} ry={9} fill={shoe} />
 						<ellipse cx={lF[2][0] + 12} cy={lF[2][1] - 2} rx={9} ry={3} fill={lighten(shoe, 0.35)} opacity={0.7} />
 					</>
@@ -363,6 +437,59 @@ export const Stickman: React.FC<Props> = (p) => {
 							<circle cx={-12} cy={-90} r={3} fill={darken(color, 0.15)} />
 						</>
 					) : null}
+{outfit === 'polo' ? (
+						<>
+							<path d={`M${-16},${torsoTop + 2} L${0},${torsoTop + 16} L${16},${torsoTop + 2} L${10},${torsoTop - 2} L${0},${torsoTop + 6} L${-10},${torsoTop - 2} Z`} fill={trim} />
+							<circle cx={0} cy={torsoTop + 24} r={2.6} fill={trim} />
+							<circle cx={0} cy={torsoTop + 34} r={2.6} fill={trim} />
+							<rect x={-bw} y={-26} width={bw * 2} height={7} fill={trim} opacity={0.85} />
+						</>
+					) : null}
+					{outfit === 'dress' ? (
+						<>
+							<path d={`M${-bw - 2},${-34} L${bw + 2},${-34} L${bw + 22},${30} Q0,${40} ${-bw - 22},${30} Z`} fill={color} />
+							<path d={`M${-bw - 10},${0} L${bw + 10},${0} L${bw + 22},${30} Q0,${40} ${-bw - 22},${30} Z`} fill={darken(color, 0.12)} opacity={0.6} />
+							<rect x={-bw - 2} y={-40} width={bw * 2 + 4} height={8} rx={3} fill={trim} />
+							<circle cx={10} cy={torsoTop + 26} r={7} fill={trim} opacity={0.9} />
+						</>
+					) : null}
+					{outfit === 'vest' ? (
+						<>
+							<path d={`M${-bw},${torsoTop + 4} L${-4},${torsoTop + 4} L${-4},${8} L${-bw},${8} Z`} fill={trim} />
+							<path d={`M${bw},${torsoTop + 4} L${4},${torsoTop + 4} L${4},${8} L${bw},${8} Z`} fill={trim} />
+							<rect x={-bw + 5} y={-56} width={18} height={14} rx={2} fill="none" stroke={darken(trim, 0.3)} strokeWidth={2.2} />
+							<rect x={bw - 23} y={-56} width={18} height={14} rx={2} fill="none" stroke={darken(trim, 0.3)} strokeWidth={2.2} />
+							<line x1={0} y1={torsoTop + 4} x2={0} y2={8} stroke={darken(trim, 0.35)} strokeWidth={2} strokeDasharray="4 3" />
+						</>
+					) : null}
+					{outfit === 'shirt' ? (
+						<>
+							<path d={`M${-12},${torsoTop + 1} L${0},${torsoTop + 14} L${12},${torsoTop + 1}`} stroke={trim} strokeWidth={5} fill="none" strokeLinejoin="round" />
+							{[22, 44, 66, 88].map((d) => (
+								<circle key={d} cx={2} cy={torsoTop + d} r={2.4} fill={darken(color, 0.35)} />
+							))}
+							<rect x={10} y={torsoTop + 22} width={15} height={13} rx={2} fill="none" stroke={darken(color, 0.25)} strokeWidth={2} />
+						</>
+					) : null}
+					{outfit === 'hivis' ? (
+						<>
+							<rect x={-bw} y={-58} width={bw * 2} height={9} fill={trim} />
+							<rect x={-bw} y={-30} width={bw * 2} height={9} fill={trim} />
+						</>
+					) : null}
+					{acc.includes('apronOver') ? (
+						<>
+							<rect x={-bw + 6} y={torsoTop + 30} width={bw * 2 - 12} height={-torsoTop - 6} rx={6} fill="#f1ede4" />
+							<line x1={-bw + 10} y1={torsoTop + 32} x2={-6} y2={torsoTop + 4} stroke="#f1ede4" strokeWidth={3} />
+							<line x1={bw - 10} y1={torsoTop + 32} x2={6} y2={torsoTop + 4} stroke="#f1ede4" strokeWidth={3} />
+						</>
+					) : null}
+					{acc.includes('tape') ? (
+						<g transform={`translate(${-bw + 2},-8)`}>
+							<rect x={-8} y={-10} width={20} height={20} rx={4} fill="#f2c230" stroke="#3a3020" strokeWidth={2} />
+							<circle cx={2} cy={0} r={4} fill="#3a3020" />
+						</g>
+					) : null}
 					{p.chestText ? (
 						<g transform={`translate(4,${torsoTop + 40}) rotate(-4)`}>
 							<rect x={-26} y={-10} width={52} height={20} rx={3} fill="#fbfaf4" stroke="#c94a3a" strokeWidth={2} />
@@ -371,7 +498,7 @@ export const Stickman: React.FC<Props> = (p) => {
 					) : null}
 				</g>
 				{/* front arm */}
-				<Limb pts={aF} w={24} c={color} hi={hi} hiSide={-1} />
+<Limb pts={aF} w={24 * BW} c={color} hi={hi} hiSide={-1} />
 				{p.handItem ? <g transform={`translate(${aF[2][0]},${aF[2][1]})`}>{p.handItem}</g> : null}
 				{(() => {
 					const h = aF[2];
@@ -388,10 +515,10 @@ export const Stickman: React.FC<Props> = (p) => {
 						);
 					return null;
 				})()}
-				{p.fist ? <Fist at={aF[2]} ang={pose.armF[0] + pose.armF[1]} k={p.fist} size={p.fistK} /> : <circle cx={aF[2][0]} cy={aF[2][1]} r={10} fill="#0b0b0d" />}
+{p.fist ? <Fist at={aF[2]} ang={pose.armF[0] + pose.armF[1]} k={p.fist} size={p.fistK} /> : p.handF ? <circle cx={aF[2][0]} cy={aF[2][1]} r={10} fill="#0b0b0d" /> : <Hand at={aF[2]} ang={pose.armF[0] + pose.armF[1]} cuff={cuff} />}
 				{/* head */}
 				<line x1={add(hip, up, T - 10)[0]} y1={add(hip, up, T - 10)[1]} x2={headC[0]} y2={headC[1]} stroke="#000" strokeWidth={12} />
-				<g transform={`translate(${headC[0]},${headC[1]}) rotate(${pose.head + lean * 0.25})`}>
+<g transform={`translate(${headC[0]},${headC[1]}) rotate(${pose.head + lean * 0.25}) scale(${HK})`}>
 					<HeadShape hair={hair} hairColor={hairColor} front={false} />
 					{p.hood ? <ellipse cx={-7} cy={-3} rx={R + 13} ry={R + 12} fill={sh} /> : null}
 					{p.hood ? <path d={`M${-R - 16},${-6} C${-R - 14},${-R - 26} ${R + 6},${-R - 30} ${R + 8},${-14}`} stroke={color} strokeWidth={9} fill="none" strokeLinecap="round" /> : null}
@@ -406,7 +533,17 @@ export const Stickman: React.FC<Props> = (p) => {
 				</g>
 			</g>
 			{/* face sits outside the rim filter so the white strokes stay crisp */}
-			<g transform={`translate(${headC[0]},${headC[1]}) rotate(${pose.head + lean * 0.25})`}>
+<g transform={`translate(${headC[0]},${headC[1]}) rotate(${pose.head + lean * 0.25}) scale(${HK})`}>
+				{acc.includes('foreheadGlasses') ? (
+					<g stroke="#fff" strokeWidth={2.5} fill="#9fd3ff" fillOpacity={0.25}>
+						<ellipse cx={-14 + ex} cy={-33} rx={11} ry={7} />
+						<ellipse cx={14 + ex} cy={-33} rx={11} ry={7} />
+						<line x1={-3 + ex} y1={-33} x2={3 + ex} y2={-33} />
+					</g>
+				) : null}
+				{acc.includes('beard') ? (
+					<path d={`M${-R + 8},${4} Q${-R + 10},${R - 6} ${ex * 0.5},${R + 4} Q${R - 10},${R - 6} ${R - 8},${4}`} stroke={hairColor} strokeWidth={7} fill="none" strokeLinecap="round" strokeDasharray="2 6" />
+				) : null}
 				<Eye cx={eL[0]} cy={eL[1]} rx={erx} ry={ery} pr={pr} look={look} lid={Math.max(lid, p.lidL ?? 0)} />
 				<Eye cx={eR[0]} cy={eR[1]} rx={erx} ry={ery} pr={pr} look={look} lid={Math.max(lid, p.lidR ?? 0)} />
 				{age > 0.05 ? (

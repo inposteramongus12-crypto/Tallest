@@ -2,51 +2,40 @@ import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {Actor} from './kit/core';
 import {idle} from './kit/actions';
-import {Chick, Pigeon} from './engine/props';
 import {FONT} from './kit/ui';
-import {Knuckles, Pose, frontHand} from './engine/Stickman';
+import {Pose} from './engine/Stickman';
+import {PROPS_SHEET} from './story/props';
 
-// fists held out in front, so the knuckles are seen from the side
-const FISTS: Pose = {lean: 4, head: 0, armB: [40, 70], armF: [78, 38], legB: [-4, 2], legF: [4, 2]};
-
-/* Character sheet: every character on the dark-blue and on the warm-light background. */
+/* Character sheet: every character on the dark-blue and on the warm-light background, plus the story props. */
 const COLS = 7;
 const CW = 1920 / COLS;
 const BAND = 440;
-type Slot = {who?: string; label: string; fist?: Knuckles; birds?: 'pigeons' | 'chick'};
+type Slot = {who: string; label: string; s?: number};
 const SLOTS: Slot[] = [
-	{who: 'hero', label: 'ДАНЯ · обычные', fist: 'skin'},
-	{who: 'hero', label: 'ДАНЯ · белые', fist: 'white'},
-	{who: 'leha', label: 'ЛЁХА'},
-	{who: 'coach', label: 'СЕМЁН ИЛЬИЧ'},
-	{who: 'mama', label: 'МАМА'},
-	{who: 'gera', label: 'ГЕРА'},
-	{who: 'rival', label: 'СОПЕРНИК'},
-	{who: 'referee', label: 'РЕФЕРИ'},
-	{who: 'douglas', label: 'ДУГЛАС (Токио)'},
-	{who: 'svita1', label: 'СВИТА 1'},
-	{who: 'svita2', label: 'СВИТА 2'},
-	{who: 'svita3', label: 'СВИТА 3'},
-	{label: 'ГОЛУБИ', birds: 'pigeons'},
-	{label: 'ПТЕНЕЦ', birds: 'chick'},
+	{who: 'hero', label: 'ЯРИК'},
+	{who: 'sis', label: 'АСЯ', s: 0.68},
+	{who: 'friend', label: 'МИРОН'},
+	{who: 'dad', label: 'ПАПА'},
+	{who: 'blogger', label: 'БЛОГЕР'},
+	{who: 'operator', label: 'ОПЕРАТОР'},
+	{who: 'rescuer', label: 'СПАСАТЕЛЬ'},
+	{who: 'neighbor', label: 'СОСЕДКА'},
+	{who: 'neighborM', label: 'СОСЕД'},
+	{who: 'kid', label: 'МАЛЬЧИК', s: 0.62},
+	{who: 'rival1', label: 'СТАРШЕКЛ. 1'},
+	{who: 'rival2', label: 'СТАРШЕКЛ. 2'},
+	{who: 'cashier', label: 'КАССИР'},
+	{who: 'granny', label: 'БАБУШКА'},
 ];
+// arms out to the sides so the hands and cuffs read
+const OPEN: Pose = {lean: 0, head: 0, armB: [-38, 30], armF: [44, 30], legB: [-6, 2], legF: [6, 2]};
 const S = 0.8;
 const Cell: React.FC<{slot: Slot; i: number; light: boolean}> = ({slot, i, light}) => {
 	const cx = CW / 2;
 	const floor = BAND - 90;
 	return (
 		<g>
-			{slot.who ? (
-				<Actor who={slot.who} x={cx} floor={floor} s={S} facing={1} faceTurn={0.3} uid={`c${i}${light ? 'l' : 'd'}`} seed={i} fist={slot.fist} pose={slot.fist ? FISTS : idle(0, i)} />
-			) : slot.birds === 'pigeons' ? (
-				<g>
-					<Pigeon x={cx - 60} y={floor} s={1.25} />
-					<Pigeon x={cx + 70} y={floor} s={1.1} facing={-1} body="#c9ccd6" />
-					<Pigeon x={cx} y={floor - 130} s={1} wing={0.8} body="#6f7a93" />
-				</g>
-			) : (
-				<Chick x={cx} y={floor} s={2.4} />
-			)}
+			<Actor who={slot.who} x={cx} floor={floor} s={S * (slot.s ?? 1)} facing={1} faceTurn={0.3} uid={`c${i}${light ? 'l' : 'd'}`} seed={i} pose={i % 2 ? OPEN : idle(0, i)} />
 			<text x={cx} y={BAND - 28} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={21} fill={light ? '#2a2f3f' : '#fff'}>
 				{slot.label}
 			</text>
@@ -75,22 +64,15 @@ export const CastSheet: React.FC = () => (
 	</AbsoluteFill>
 );
 
-/* Close and medium shots of the hero's fists in one of the two knuckle states. */
-export const KnucklesShot: React.FC<{state: Knuckles; mode: 'close' | 'medium'}> = ({state, mode}) => {
-	const s = 1.05;
-	const p = FISTS;
-	const [hx, hy] = frontHand(p, 960, 900 - 157 * s, s, 1);
-	const view = mode === 'close' ? {w: 380, cx: hx, cy: hy} : {w: 760, cx: hx - 150, cy: hy + 70};
-	const h = (view.w * 9) / 16;
-	return (
-		<AbsoluteFill style={{background: '#2a3550'}}>
-			<svg width={1920} height={1080} viewBox={`${view.cx - view.w / 2} ${view.cy - h / 2} ${view.w} ${h}`}>
-				<rect x={-400} y={900} width={3000} height={400} fill="#1a2238" />
-				<Actor who="hero" x={960} floor={900} s={s} facing={1} faceTurn={0.3} uid={'k' + state} fist={state} pose={p} shadow />
-			</svg>
-			<div style={{position: 'absolute', left: 36, top: 28, fontFamily: FONT, fontWeight: 800, fontSize: 40, color: '#fff', textShadow: '0 2px 6px #000'}}>
-				{state === 'white' ? 'КОСТЯШКИ БЕЛЫЕ (сжат)' : 'КОСТЯШКИ ОБЫЧНЫЕ (расслаблен)'}
-			</div>
-		</AbsoluteFill>
-	);
-};
+/* Close-up of the four main characters (hands, cuffs, faces) and the story props. */
+export const HandsShot: React.FC = () => (
+	<AbsoluteFill style={{background: '#e9dcc3'}}>
+		<svg width={1920} height={1080}>
+			<rect x={0} y={760} width={1920} height={320} fill="#cdbb98" />
+			{['hero', 'sis', 'friend', 'dad'].map((w, i) => (
+				<Actor key={w} who={w} x={190 + i * 330} floor={760} s={w === 'sis' ? 1.05 : 1.45} faceTurn={0.3} uid={'h' + w} pose={OPEN} />
+			))}
+			<g transform="translate(1380,80)">{PROPS_SHEET}</g>
+		</svg>
+	</AbsoluteFill>
+);
