@@ -175,7 +175,7 @@ const S37: React.FC = () => {
 	const k = env(f, 10, 9999, 20, 1);
 	const pose = reach({...idle(f, 2), lean: 30}, 'F', toLocal(1250, GY - 120, 900, heroHip(GY, s), s, 1), k * (f < 70 ? 1 : 0));
 	return (
-		<Outdoor tod="sunset" id="s37" cam={camK(f, [[0, 1150, 880, 1.7], [70, 1050, 520, 1.0]])} sun={[1850, 820]}>
+		<Outdoor tod="sunset" id="s37" cam={camK(f, [[0, 1150, 760, 1.2], [70, 1050, 520, 1.0]])} sun={[1850, 820]}>
 			<Ground gy={GY} tod="sunset" />
 			<Giant x={900} gy={GY} ppm={P} h={12} uid="h37" pose={f < 70 ? pose : reach(idle(f, 2), 'F', [30, -330], 1)} handItem={f >= 70 && f < 110 ? <Pie x={0} y={6} s={0.35} /> : undefined} mouth={f > 100 ? 'smile' : 'line'} badge={0.8} />
 			<Person who="neighbor" x={1300} gy={GY} ppm={P} facing={-1} uid="n37" pose={reach(idle(f, 4), 'F', [70, -100], 0.9)} handItem={f < 70 ? <Pie x={0} y={6} s={0.5} /> : undefined} />

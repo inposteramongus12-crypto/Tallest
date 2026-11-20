@@ -388,7 +388,7 @@ const SunIcon: React.FC<{hi: boolean}> = ({hi}) => (
 		<path d={`M-8,0 L${hi ? 60 : 380},0 L${hi ? 60 : 380},12 L-8,12 Z`} fill="#000" opacity={0.6} />
 	</g>
 );
-const S13: React.FC = () => <Rule n="1" text="Ты во столько раз выше себя, во сколько тень палки длиннее палки" icon={<g><g transform="translate(-300,40)"><SunIcon hi /></g><g transform="translate(120,40)"><SunIcon hi={false} /></g></g>} />;
+const S13: React.FC = () => <Rule n="1" text="Ты во столько раз выше себя, во сколько тень палки длиннее палки" icon={<g transform="translate(0,60) scale(1.2)"><g transform="translate(-330,40)"><SunIcon hi /></g><g transform="translate(60,40)"><SunIcon hi={false} /></g></g>} />;
 /* 029–030: Eratosthenes card */
 const S14: React.FC = () => {
 	const {f, at} = useShot();
@@ -504,14 +504,14 @@ export const EveningYard: React.FC<{hk: [number, number][]; sunY: (f: number) =>
 		<Outdoor tod={tod} id={id} cam={camK(f, camKeys)} sun={[1750, sunY(f)]} sunR={70}>
 			<Yard tod={tod} ppm={P} gy={GY} bx={100} />
 			<Giant x={1100} gy={GY} ppm={P} h={h} hk={hk} f={f} uid={'g' + id} shadow={{dir: -1, k: Math.min(10, k), o: 0.28}} look={[0.6, -0.2]} />
-			{friend ? <Person who="friend" x={1290} gy={GY} ppm={P} facing={-1} uid={'m' + id} look={[-0.2, -1]} pose={gesture('handsOnHead', idle(f, 6), 0.5, f)} /> : null}
+			{friend ? <Person who="friend" x={1480} gy={GY} ppm={P} facing={-1} uid={'m' + id} look={[-0.2, -1]} pose={gesture('handsOnHead', idle(f, 6), 0.5, f)} /> : null}
 			{children}
 		</Outdoor>
 	);
 };
 const S19: React.FC = () => {
 	const {at} = useShot();
-	return <EveningYard id="s19" hk={[[0, 5.9], [at('040') + 120, 12], [at('041') + 20, 16]]} sunY={(f) => 640 + f * 0.6} camKeys={[[0, 1100, 760, 1.1], [at('041'), 1050, 560, 0.85], [at('042'), 1250, 860, 1.5]]} />;
+	return <EveningYard id="s19" hk={[[0, 5.9], [at('040') + 120, 12], [at('041') + 20, 16]]} sunY={(f) => 640 + f * 0.6} camKeys={[[0, 1100, 760, 1.1], [at('041'), 1050, 560, 0.85], [at('042'), 1450, 880, 1.6]]} />;
 };
 const S20: React.FC = () => <Rule n="3" text="Самое большое — в 10 раз: 16 метров" />;
 /* 044–046: sunset shrink; bench with Мирон and juice */
@@ -555,7 +555,7 @@ const S23: React.FC = () => (
 		n="4"
 		text="Только солнце. Лампы не считаются"
 		icon={
-			<g>
+			<g transform="translate(0,-40) scale(1.3)">
 				<g transform="translate(-320,0)">
 					<circle r={26} fill="#ffe9a8" />
 					{[-60, -30, 0, 30, 60].map((a) => (

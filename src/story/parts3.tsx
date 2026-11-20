@@ -53,7 +53,7 @@ const S54: React.FC = () => {
 };
 
 /* night park with the wheel; moon low on the left, the beach between the trees and the wheel */
-const MOON: [number, number] = [-120, 860];
+const MOON: [number, number] = [330, 840];
 export const ParkNight: React.FC<{cam: ReturnType<typeof camOn>; rot: number; lights: number; id: string; children?: React.ReactNode; moonUp?: number; treesShade?: boolean}> = ({cam, rot, lights, id, children, moonUp = 0, treesShade = true}) => {
 	const P = 30, GY = 1000;
 	return (
@@ -77,8 +77,8 @@ const S55: React.FC = () => {
 	const cam = camK(f, [[0, 1300, 640, 0.95], [at('127'), cx, cy + 40, 2.4]]);
 	return (
 		<ParkNight cam={cam} rot={rot} lights={out} id="s55">
-			<Actor who="sis" x={cx - 8} floor={cy + 1.8 * 30} s={sOf(1.3, 30) * 0.9} uid="s55" pose={gesture('handsOnHead', idle(f, 5), 1 - out, f)} />
-			<Actor who="dad" x={cx + 12} floor={cy + 1.8 * 30} s={sOf(1.8, 30) * 0.8} uid="d55" facing={-1} pose={reach(idle(f, 3), 'F', [-20, -80], 1 - out)} />
+			<Actor who="sis" x={cx - 10} floor={cy + 2.05 * 30} s={0.12} uid="s55" pose={gesture('handsOnHead', idle(f, 5), 1 - out, f)} />
+			<Actor who="dad" x={cx + 12} floor={cy + 2.05 * 30} s={0.14} uid="d55" facing={-1} pose={reach(idle(f, 3), 'F', [-20, -80], 1 - out)} />
 			{f >= at('126') && f < at('126') + 50 ? <Big x={960} y={260} text="23:20" size={60} c="#ff6a5a" /> : null}
 		</ParkNight>
 	);
@@ -361,7 +361,7 @@ const S70: React.FC = () => {
 	const dawn = interpolate(f, [0, 120], [0, 1], clamp);
 	return (
 		<ParkNight cam={usePush(camOn(700, 700, 0.95), camOn(900, 680, 1.05))} rot={-180} lights={0} id="s70" moonUp={-f * 0.6} treesShade={false}>
-			<rect x={1200} y={-400} width={1400} height={1400} fill="#ffb46a" opacity={0.25 * dawn} />
+			<rect x={-2000} y={-1000} width={6000} height={1700} fill="#ffb46a" opacity={0.18 * dawn} />
 			<Actor who="hero" x={HX} floor={1000} seat={1000 - 0.3 * 14.6 * 30} s={sOf(14.6, 30)} pose={SIT} uid="h70" />
 			<Big x={300} y={300} text="03:00" size={56} c="#ff6a5a" />
 		</ParkNight>
