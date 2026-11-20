@@ -1,0 +1,90 @@
+{
+ "ambience": [
+  {
+   "from": "001",
+   "to": "003",
+   "kind": "street",
+   "gain": 0.07
+  },
+  {
+   "from": "003",
+   "to": "004",
+   "kind": "room",
+   "gain": 0.09
+  },
+  {
+   "from": "004",
+   "to": "006",
+   "kind": "wind",
+   "gain": 0.05
+  },
+  {
+   "from": "006",
+   "to": "007",
+   "kind": "room",
+   "gain": 0.04
+  },
+  {
+   "from": "007",
+   "to": "012",
+   "kind": "sea",
+   "gain": 0.05
+  },
+  {
+   "from": "012",
+   "to": "end",
+   "kind": "wind",
+   "gain": 0.05
+  }
+ ],
+ "music": [],
+ "sfx": [
+  {
+   "at": "001",
+   "off": 30,
+   "type": "steps",
+   "dur": 1.5,
+   "amp": 0.25
+  },
+  {
+   "at": "004",
+   "off": 6,
+   "type": "gong",
+   "amp": 0.2
+  },
+  {
+   "at": "005",
+   "off": 0,
+   "type": "whooshUp",
+   "dur": 1
+  },
+  {
+   "at": "006",
+   "off": 4,
+   "type": "swoosh"
+  },
+  {
+   "at": "007",
+   "off": 10,
+   "type": "switch",
+   "amp": 0.5
+  },
+  {
+   "at": "008",
+   "off": 0,
+   "type": "whoosh"
+  },
+  {
+   "at": "010",
+   "off": 4,
+   "type": "whooshUp",
+   "dur": 2
+  },
+  {
+   "at": "012",
+   "off": 6,
+   "type": "ding"
+  }
+ ],
+ "silence": []
+}

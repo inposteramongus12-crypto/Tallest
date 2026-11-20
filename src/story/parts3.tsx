@@ -130,7 +130,8 @@ const S57: React.FC = () => {
 					) : (
 						<g>
 							<Encyclopedia x={960} y={760} s={3} open />
-							<Big x={960} y={300} text="«Луна — просто зеркало»" size={80} c="#3a2a1a" hand />
+							<Big x={960} y={260} text="«Луна —" size={80} c="#3a2a1a" hand />
+							<Big x={960} y={350} text="просто зеркало»" size={80} c="#3a2a1a" hand />
 						</g>
 					)}
 				</svg>
