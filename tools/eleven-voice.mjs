@@ -1,17 +1,20 @@
 // Voices src/story/lines.json with ElevenLabs -> public/vo/<id>.mp3 (same file names as voice-free).
 //   node tools/eleven-voice.mjs --plan              count characters still to voice, show credits on all keys, no voicing
 //   node tools/eleven-voice.mjs [--only 077,078]     voice (skips lines already voiced with the same text)
-//   node tools/eleven-voice.mjs ... --key1-only      never switch to the other keys
+//   node tools/eleven-voice.mjs ... --keys 3        use keys 1..3 only;  --keys 2,5 = exactly keys 2 and 5
+//   node tools/eleven-voice.mjs ... --key1-only      same as --keys 1
 //   node tools/eleven-voice.mjs ... --skip 1,3      never use these key numbers
 //   node tools/eleven-voice.mjs ... --force          re-voice even if already done
 // Voices come from src/story/voices.json: {"N": {"name": "George", "eleven": "<voice_id>"}, ...}.
-// Keys only from the environment (ELEVENLABS_API_KEY, ELEVENLABS_API_KEY_2 ... ELEVENLABS_API_KEY_6); they are never printed or stored.
-// Before every line the remaining credits of key 1 are checked; if they do not cover the line, the next key (2, then 3 ... up to 6) is used.
+// Keys only from the environment: every variable with ELEVENLABS in its name (see tools/eleven-keys.mjs); never printed or stored.
+// A line always goes to ONE key. Before every line the remaining credits of the keys are checked in order;
+// the first key that covers the whole line is used. 1.2 s between lines; on 429 retries after 3, 6, 12, 24, 48 s.
 // The subscription counter on ElevenLabs lags behind, so the remaining credits are also tracked locally
 // (credits at start minus characters sent) and the smaller of the two numbers is trusted.
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {findKeys, pickKeys} from './eleven-keys.mjs';
 if (!process.env.NODE_USE_ENV_PROXY && process.env.HTTPS_PROXY) {
 	const r = spawnSync(process.execPath, process.argv.slice(1), {stdio: 'inherit', env: {...process.env, NODE_USE_ENV_PROXY: '1'}});
 	process.exit(r.status ?? 1);
@@ -31,20 +34,23 @@ fs.mkdirSync(outDir, {recursive: true});
 const madeFile = path.join(outDir, '.made-eleven.json');
 const made = fs.existsSync(madeFile) ? JSON.parse(fs.readFileSync(madeFile, 'utf8')) : {};
 
-const KEYS = [process.env.ELEVENLABS_API_KEY, ...[2, 3, 4, 5, 6].map((n) => (key1Only ? undefined : process.env['ELEVENLABS_API_KEY_' + n]))]
-	.map((k, i) => (k ? {n: i + 1, k, sent: 0, start: null} : null))
-	.filter((k) => k && !skip.includes(k.n));
-if (!KEYS.length) throw new Error('ELEVENLABS_API_KEY is not set');
+const keysArg = key1Only ? '1' : args.includes('--keys') ? args[args.indexOf('--keys') + 1] : null;
+const KEYS = pickKeys(findKeys(), keysArg)
+	.filter((k) => !skip.includes(k.n))
+	.map((k) => ({...k, sent: 0, start: null}));
+if (!KEYS.length) throw new Error('no ElevenLabs key in the environment (a variable with ELEVENLABS in its name)');
+console.log(`keys found: ${KEYS.map((k) => `${k.n}=${k.name}`).join(', ')}`);
+const BACKOFF = [3000, 6000, 12000, 24000, 48000]; // waits after a 429
 // local ledger survives between runs (key number only, never the key): the API counter lags by minutes
 const ledgerFile = path.join(outDir, '.eleven-ledger.json');
 const ledger = fs.existsSync(ledgerFile) ? JSON.parse(fs.readFileSync(ledgerFile, 'utf8')) : {};
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 const left = async (key) => {
 	let r;
-	for (let t = 0; t < 6; t++) {
+	for (let t = 0; t <= BACKOFF.length; t++) {
 		r = await fetch('https://api.elevenlabs.io/v1/user/subscription', {headers: {'xi-api-key': key.k}});
-		if (r.status !== 429) break;
-		await sleep(2000 * 2 ** t);
+		if (r.status !== 429 || t === BACKOFF.length) break;
+		await sleep(BACKOFF[t]);
 	}
 	if (r.status === 429 && key.start !== null) return {used: key.used0 + key.sent, limit: key.limit, tier: key.tier, left: key.start - key.sent, local: true}; // rate-limited: trust the local count
 	if (!r.ok) return {error: `key ${key.n}: subscription ${r.status} ${(await r.text()).slice(0, 160)}`};
@@ -81,7 +87,7 @@ for (const key of KEYS) {
 		console.log(`key ${key.n}: ${s.tier}, used ${s.used} of ${s.limit}, left ${s.left}`);
 	}
 }
-console.log(`credits available: ${have}, needed: ${need}, reserve: ${have - need}`);
+console.log(`credits available on ${KEYS.length} keys: ${have}, needed: ${need}, reserve: ${have - need}`);
 if (plan) process.exit(0);
 if (have < need) {
 	console.log('NOT ENOUGH CREDITS for everything: nothing voiced. Shorten the text or voice part of it with --only.');
@@ -104,14 +110,15 @@ for (const l of todo) {
 			continue; // not enough on this key: try the next one
 		}
 		let r;
-		for (let t = 0; t < 5; t++) {
+		for (let t = 0; t <= BACKOFF.length; t++) {
 			r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${v}?output_format=mp3_44100_128`, {
 				method: 'POST',
 				headers: {'xi-api-key': key.k, 'content-type': 'application/json'},
 				body: JSON.stringify({text: l.t, model_id: MODEL}),
 			});
-			if (r.status !== 429) break;
-			await sleep(3000 * 2 ** t);
+			if (r.status !== 429 || t === BACKOFF.length) break;
+			console.log(`${l.id}: 429, retry in ${BACKOFF[t] / 1000} s`);
+			await sleep(BACKOFF[t]);
 		}
 		if (!r.ok) {
 			const msg = (await r.text()).slice(0, 200);

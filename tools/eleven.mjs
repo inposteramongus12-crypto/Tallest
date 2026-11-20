@@ -1,4 +1,5 @@
-// ElevenLabs helper (project tool). Keys only from ELEVENLABS_API_KEY and _2.._6 (--key N, default 1), never stored.
+// ElevenLabs helper (project tool). Keys from every ELEVENLABS* variable (tools/eleven-keys.mjs; --key N, default 1), never stored.
+//   node tools/eleven.mjs keys               key numbers and variable names (no values)
 //   node tools/eleven.mjs check              test request: account + credits
 //   node tools/eleven.mjs voices [--ru]      voices available to this key
 // Node's fetch ignores HTTPS_PROXY by default; NODE_USE_ENV_PROXY=1 makes it use the session proxy.
@@ -7,8 +8,13 @@ if (!process.env.NODE_USE_ENV_PROXY && process.env.HTTPS_PROXY) {
 	const r = spawnSync(process.execPath, process.argv.slice(1), {stdio: 'inherit', env: {...process.env, NODE_USE_ENV_PROXY: '1'}});
 	process.exit(r.status ?? 1);
 }
-const kn = process.argv.includes('--key') ? Number(process.argv[process.argv.indexOf('--key') + 1]) : 1; // key number 1..6, default 1
-const KEY = kn === 1 ? process.env.ELEVENLABS_API_KEY : process.env['ELEVENLABS_API_KEY_' + kn];
+const {findKeys} = await import('./eleven-keys.mjs');
+if (process.argv[2] === 'keys') {
+	for (const k of findKeys()) console.log(`key ${k.n}: ${k.name}`);
+	process.exit(0);
+}
+const kn = process.argv.includes('--key') ? Number(process.argv[process.argv.indexOf('--key') + 1]) : 1; // key number, default 1
+const KEY = findKeys().find((k) => k.n === kn)?.k;
 if (!KEY) {
 	console.error(`key ${kn} is not set`);
 	process.exit(2);
