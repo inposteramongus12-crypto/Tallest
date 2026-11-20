@@ -90,7 +90,14 @@ N — рассказчик; HERO — Ярик, 14; SIS — Ася, 9, сестр
 
 ## Этап 5 (рендер на Actions)
 - Проба: run 44741027042 (Long, lines:001-010, chunk 150) — запущен из сессии через MCP (actions_run_trigger, workflow render.yml, ref main).
-- Дальше: полный Long `lines:001-171`, chunk 150; потом Short `lines:001-012`.
+- Проба готова и проверена: артефакт `video-Long-lines-001-010` (47,1 с), check-video: −16,09 LUFS, пик −1,4 дБ, без миганий/чёрных/статичных.
+- Полный Long: run 44742025485 (lines:001-171, chunk 150) — 146 кусков отрендерены успешно, на момент записи шла склейка (join). Short: run 44742089109 (lines:001-012) — в очереди за ним.
+- СЛЕДУЮЩИЕ ШАГИ после /compact:
+  1. `actions_list list_workflow_run_artifacts` для обоих run → артефакты `video-Long-lines-001-171` и `video-Short-lines-001-012`; `actions_get download_workflow_run_artifact` → curl в `out/dl/`, распаковать (python zipfile).
+  2. `node tools/check-video.mjs out/dl/<файл>.mp4` (длительность ≈ 12:12 и 49 с, −16 LUFS, FLASH/STATIC/стыки).
+  3. Вырезать по 5–6 крупных кадров (хук ~0:05, середина ~4:30, кульминация ~10:00–10:40, финал ~11:40) через ffmpeg (`node -e "import('./tools/lib.mjs').then(m=>console.log(m.ffbin()))"`), посмотреть, исправить дефекты, перерендерить ОДИН раз (только затронутый диапазон или весь).
+  4. Сказать пользователю, где взять файлы (артефакты Actions run; ссылка html_url run).
+- Списки jobs/artifacts через MCP очень большие (>90 тыс. знаков): брать get_workflow_run и list_workflow_run_artifacts с perPage, не list_workflow_jobs.
 
 ## Этап 7 (тексты)
 - Промты превью: `thumbnail/prompt.md` (основной и запасной). Остальное (названия, описание с главами, источники, хештеги, закреп) — после рендера.
