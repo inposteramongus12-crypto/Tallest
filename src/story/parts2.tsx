@@ -7,7 +7,7 @@ import {env, gesture, idle, reach, run, walkTo, SIT} from '../kit/actions';
 import {Kitchen, KitchenTable, Shop, Counter} from '../kit/sets';
 import {Chair} from '../engine/props';
 import {PhoneChat} from '../kit/ui';
-import {Bench, Block, Ground, Goal, Garages, HBadge, Poplar, RoomWin, SkyBox, CastShadow, Fridge, kitchenWin, sOf, Sign} from './places';
+import {Wheel, Bench, Block, Ground, Goal, Garages, HBadge, Poplar, RoomWin, SkyBox, CastShadow, Fridge, kitchenWin, sOf, Sign} from './places';
 import {Cake, Calendar, Dog, Kite, Notebook, Phone, Pie, Plate} from './props';
 import {Big, Card, Giant, Outdoor, Person, camK} from './sceneKit';
 import {hAt, hot} from './common';
@@ -128,7 +128,7 @@ const S34: React.FC = () => {
 				</Svg>
 			</Layer>
 			<AbsoluteFill>
-				<PhoneChat t={f} title="Чат дома 12" msgs={[{at: 6, from: 'Соседка', text: 'ПОМОГИТЕ! Бублик убежал утром 🐶'}, {at: 40, from: 'Соседка', text: 'Рыжий, с синим бантом'}]} />
+				<svg width={1920} height={1080}><PhoneChat t={f} title="Чат дома 12" msgs={[{at: 6, from: 'Соседка', text: 'ПОМОГИТЕ! Бублик убежал утром 🐶'}, {at: 40, from: 'Соседка', text: 'Рыжий, с синим бантом'}]} /></svg>
 			</AbsoluteFill>
 			<AbsoluteFill>
 				<svg width={1920} height={1080}>
@@ -195,7 +195,7 @@ const S38: React.FC = () => {
 	const pose = reach(idle(f, 2), 'F', toLocal(palm[0], palm[1], hx, heroHip(GY, s), s, 1), 1);
 	const cam = sp === 'SIS' ? camOn(palm[0], palm[1] - 40, 2.2) : sp === 'HERO' ? camOn(hx, GY - 15 * P, 1.6) : camK(f, [[0, 900, 700, 0.9], [at('077'), palm[0], palm[1], 1.8], [at('079'), 900, 640, 0.9]]);
 	return (
-		<Outdoor tod="sunset" id="s38" cam={cam} sun={[1800, 830]} sunR={70} far={<g><Block x={-600} gy={GY} ppm={P * 0.8} tod="sunset" kitchen={false} /><g opacity={0.8}><circle cx={1500} cy={GY - 520} r={300} fill="none" stroke="#f4e8d8" strokeWidth={6} /></g></g>}>
+		<Outdoor tod="sunset" id="s38" cam={cam} sun={[1800, 830]} sunR={70} far={<g><Block x={-600} gy={GY} ppm={P * 0.8} tod="sunset" kitchen={false} /><g opacity={0.75}><Wheel cx={1550} gy={GY} ppm={P * 0.8} rot={0} lights={0} tod="sunset" /></g></g>}>
 			<Ground gy={GY} tod="sunset" />
 			<Giant x={hx} gy={GY} ppm={P} h={16} uid="h38" pose={pose} shadow={{dir: -1, k: 10, o: 0.25}} look={[0.8, 0.4]} mouth="smile" />
 			<Actor who="sis" x={palm[0]} floor={palm[1] - 8} s={sOf(1.3, P)} uid="s38" pose={gesture('point', idle(f, 5), sp === 'SIS' ? 1 : 0, f)} facing={1} />
@@ -445,7 +445,7 @@ const S50: React.FC = () => {
 	return (
 		<Stage cam={usePush(camOn(960, 560, 1), camOn(960, 540, 1.06))} bg="#2a1f40" light={false}>
 			<AbsoluteFill>
-				<PhoneChat t={f - at('106') + 10} title="Блогер ✔" msgs={[{at: 10, from: 'Блогер', text: 'Шоу «Великан на закате»!'}, {at: 40, from: 'Блогер', text: 'Пятница, 18-е, 20:30. Прямой эфир. Тысячи зрителей!'}]} />
+				<svg width={1920} height={1080}><PhoneChat t={f - at('106') + 10} title="Блогер ✔" msgs={[{at: 10, from: 'Блогер', text: 'Шоу «Великан на закате»!'}, {at: 40, from: 'Блогер', text: 'Пятница, 18-е, 20:30. Прямой эфир. Тысячи зрителей!'}]} /></svg>
 			</AbsoluteFill>
 			<AbsoluteFill>
 				<svg width={1920} height={1080}>

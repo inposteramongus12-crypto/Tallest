@@ -269,7 +269,7 @@ const S09: React.FC = () => {
 				<Kitchen />
 			</Layer>
 			<AbsoluteFill>
-				<PhoneChat t={f} title="Мирон" msgs={[{at: 8, from: 'Ярик', text: 'СРОЧНО. Приходи.', me: true}, {at: 30, from: 'Ярик', text: 'Возьми линейку', me: true}, {at: 52, from: 'Мирон', text: '?!'}]} />
+				<svg width={1920} height={1080}><PhoneChat t={f} title="Мирон" msgs={[{at: 8, from: 'Ярик', text: 'СРОЧНО. Приходи.', me: true}, {at: 30, from: 'Ярик', text: 'Возьми линейку', me: true}, {at: 52, from: 'Мирон', text: '?!'}]} /></svg>
 			</AbsoluteFill>
 		</Stage>
 	);
